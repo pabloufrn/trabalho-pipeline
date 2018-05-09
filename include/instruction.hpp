@@ -9,11 +9,12 @@ class  Instruction
 {
 	public:
 		string text;
+        string inst;
 		string r1;
 		string r2;
 		string r3;
         // precondicao: o texto da instrucao eh valido
-        Instruction(string &);
+        Instruction(string = "0");
         friend std::ostream & operator<<(std::ostream &, const Instruction &);
 };
 
@@ -29,6 +30,9 @@ struct Cycle
         EOS // end of stages
     };
     
+    Cycle();
+    
+    uint number = 1; 
     Instruction ift;
     Instruction idc;
     Instruction exe;
@@ -43,13 +47,13 @@ struct Cycle
  * \return retona true, caso a instrução tenha sido associada ao ciclo; ou false caso contrário
  * \note a referencia do ciclo final sera um ciclo apos o ciclo de associacao
  */
-bool assoc_intruction(Cycle & , const Instruction &);
+bool assoc_instruction(Cycle & , const Instruction &);
 
 /*! Imprime o ultimo ciclo e cria um novo baseado no anterior.
  * \param cyclo Último ciclo
  *
  */
-void next_ciclo(Cycle &);
+void next_cycle(Cycle &);
 
 
 
