@@ -8,34 +8,34 @@ using namespace std;
 class  Instruction
 {
 	public:
-		string instrucao;
-		string opcode;
+		string text;
 		string r1;
 		string r2;
 		string r3;
-// 		int ciclo;
-// 		int dependencia = -1;
+        // precondicao: o texto da instrucao eh valido
+        Instruction(string &);
+        friend std::ostream & operator<<(std::ostream &, const Instruction &);
 };
 
-class Cycle
+struct Cycle
 {
-    private:
-        Instruction ift;
-        Instruction idc;
-        Instruction exe;
-        Instruction mem;
-        Instruction wbc;
+    enum Stage
+    {
+        IF,
+        ID,
+        EXE,
+        MEM,
+        WB,
+        EOS // end of stages
+    };
+    
+    Instruction ift;
+    Instruction idc;
+    Instruction exe;
+    Instruction mem;
+    Instruction wbc;
         
-        enum Stage
-        {
-            IF,
-            ID,
-            EXE,
-            MEM
-            WB,
-            EOS // end of stages
-        }
-}
+};
 
 /*! Associa uma instrução a algum estágio;
  * \param ciclo ciclo para qual sera feita a tentativa de associação
@@ -43,13 +43,13 @@ class Cycle
  * \return retona true, caso a instrução tenha sido associada ao ciclo; ou false caso contrário
  * \note a referencia do ciclo final sera um ciclo apos o ciclo de associacao
  */
-bool assoc_intruction(Cyclo & ciclo, const );
+bool assoc_intruction(Cycle & , const Instruction &);
 
 /*! Imprime o ultimo ciclo e cria um novo baseado no anterior.
  * \param cyclo Último ciclo
  *
  */
-void next_ciclo(Ciclo & cyclo);
+void next_ciclo(Cycle &);
 
 
 

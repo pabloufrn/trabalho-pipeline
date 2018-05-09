@@ -1,17 +1,19 @@
 #include <iostream>
-#include <stringstream>
+#include "instruction.hpp"
 
 using namespace std;
 int main(void)
 {
     // le a entrada
-    
     // Enquanto tiver instrucoes, tente associalas
-    string instrucion;
-    while(getline(cin, instrucion))
+    string str_instrucion;
+    while(getline(cin, str_instrucion))
     {
 #ifdef DEBUG
-        cout << "processando instrucao: " << instrucion << endl;
+        {
+            Instruction ins(str_instrucion);
+            cout << "processando instrucao..." << ins << "\n";
+        }
 #endif
     }
 }
