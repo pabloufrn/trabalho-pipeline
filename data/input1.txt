@@ -1,5 +1,9 @@
-add $R0, $R5, $R6 
-add $R7, $R0, $R2
-add $R7, $R3, $R4
-sw $R2, 0($R7)
-lw $R3, 0($R7)
+beq $s0, $s1, DENTRO
+add $t1, $t2, $t3
+lw $t0, 128($t1)
+DENTRO:
+sub $t1, $t2, $t3
+addi $s5, $t1, 100
+  
+  
+  

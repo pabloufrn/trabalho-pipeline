@@ -28,9 +28,13 @@ Instruction::Instruction(std::string str)
 
         ws = str.find_first_of(',');
         r1 = str.substr(0, ws);
-        str = str.substr(ws+2, std::string::npos);
+        str = str.substr(ws+1, std::string::npos);
+        
+        ws = str.find_first_not_of(' ');
+        str = str.substr(ws, std::string::npos);
         
         ws = str.find_first_of('(');
+        memory_position = str.substr(0, ws);
         str = str.substr(ws+1, string::npos);
 
         ws = str.find_first_of(')');
@@ -62,56 +66,77 @@ Cycle::Cycle(): number(1)
 // este codigo esta propositalmente mal optimizado para facilitar a abstracao 
 bool assoc_instruction(Cycle & cic, const Instruction & inst)
 {
-    // Dependência em posição de memória
-    if(inst.inst == "lw" or inst.inst == "sw")
+    // -- Dependência em posição de memória
+    if(inst.inst == "sw" || inst.inst == "lw")
     {
-        if(inst.r2 == cic.ift.r2)
-            return false;
-        if(inst.r2 == cic.idc.r2)
-            return false;
-        if(inst.r2 == cic.exe.r2)
-            return false;
-        if(inst.r2 == cic.mem.r2)
+        if(cic.wbc.inst == "sw" and inst.memory_position == cic.wbc.memory_position)
             return false;
     }
 
-    // Testar dependencia em registrador
-    // note que a Dependência em posição de memória será tratada aqui
-    if(inst.r2 != "\0") // verifica se o r2 esta sendo usado para escrita em algum lugar
+    // -- Dependência em registrador e RAW - read-after-write
+    if(inst.inst != "sw" and inst.r2 != "\0") // verifica se o r2 esta sendo usado para escrita em algum lugar
     { 
-        if(inst.r2 == cic.ift.r1)
+        if(cic.idc.inst != "sw" and inst.r2 == cic.idc.r1)
             return false;
-        if(inst.r2 == cic.idc.r1)
+        if(cic.exe.inst != "lw" and cic.exe.inst != "sw" and inst.r2 == cic.exe.r1)
             return false;
-        if(inst.r2 == cic.exe.r1)
-            return false;
-        if(inst.r2 == cic.mem.r1)
+        if(cic.mem.inst != "lw" and cic.exe.inst != "sw" and inst.r2 == cic.mem.r1)
             return false;
     }
     if(inst.r3 != "\0") // verifica se o r3 esta sendo usado para escrita em algum lugar
     { 
-        if(inst.r3 == cic.ift.r1)
+        if(cic.idc.inst != "sw" and inst.r3 == cic.idc.r1)
             return false;
-        if(inst.r3 == cic.idc.r1)
+        if(cic.exe.inst != "sw" and inst.r3 == cic.exe.r1)
             return false;
-        if(inst.r3 == cic.exe.r1)
-            return false;
-        if(inst.r3 == cic.mem.r1)
+        if(cic.mem.inst != "sw" and inst.r3 == cic.mem.r1)
             return false;
     }
+    // Caso especial do sw. O sw lê de r1.
+    if(inst.inst == "sw")
+    {
+        if(inst.r1 == cic.ift.r1)
+            return false;
+        if(inst.r1 == cic.idc.r1)
+            return false;
+        if(inst.r1 == cic.exe.r1)
+            return false;
+        if(inst.r1 == cic.mem.r1)
+            return false;
+    }
+    // -- Conflitos estruturais
+    
+    uint memory_count = 1; // mede a quantidade de memorias que estão sendo usadas
+    // Verifica se eh possivel encaixar a instruction dependendo da quantidade de memórias.
+    if(cic.mem.inst == "lw" or cic.mem.inst == "sw")
+        ++memory_count;
+    if(cic.wbc.inst == "sw")
+        ++memory_count;
+    if(memory_count > cic.memory_number)
+        return false;
+    // Se a instrução atual for de memoria
+    if(inst.inst == "lw" or inst.inst == "sw")
+    {
+        // Verifica se está fazendo o decode de alguma instrução que use o write-back
+        // e, se tiver só uma mémoria, não poderemos encaixar a instrução.
+        if(cic.idc.inst == "sw" and cic.memory_number == 1)
+            return false;
+    }
+    
     cic.ift = inst;
     return true; 
 }
 
-void next_cycle(Cycle & cic)
+void next_cycle(Cycle & cic, std::ostream & os)
 {
-    std::cout <<    "-------------------------------------------------------\n" <<  \
-        "Ciclo " << cic.number << std::endl <<                          \
-        "BI:  " << cic.ift.text << std::endl     <<                          \
-        "DI:  " << cic.idc.text << std::endl     <<                          \
-        "EX:  " << cic.exe.text << std::endl     <<                          \
-        "MEM: " << cic.mem.text << std::endl     <<                          \
-        "WB:  " << cic.wbc.text << std::endl     <<                          \
+    os  <<                                                                  \
+        "-------------------------------------------------------\n" <<      \
+        "Ciclo " << cic.number  << std::endl      <<                        \
+        "BI:   " << cic.ift.text << std::endl     <<                        \
+        "DI:   " << cic.idc.text << std::endl     <<                        \
+        "EX:   " << cic.exe.text << std::endl     <<                        \
+        "MEM:  " << cic.mem.text << std::endl     <<                        \
+        "WB:   " << cic.wbc.text << std::endl     <<                        \
         "-------------------------------------------------------\n";
     cic.wbc = cic.mem;
     cic.mem = cic.exe;

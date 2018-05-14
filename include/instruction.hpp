@@ -1,3 +1,5 @@
+#ifndef INSTRUCTION_H
+#define INSTRUCTION_H
 #include <string>
 
 /*! Define uma instrução
@@ -10,9 +12,10 @@ class  Instruction
 	public:
 		string text;
         string inst;
-		string r1;
-		string r2;
-		string r3;
+		string r1; // registrador de escrita
+		string r2; // registrador de leitura 1
+		string r3; // registrador de leitura 2
+		string memory_position; // só é usado nas instuções lw e sw
         // precondicao: o texto da instrucao eh valido
         Instruction(string = "0");
         friend std::ostream & operator<<(std::ostream &, const Instruction &);
@@ -38,6 +41,7 @@ struct Cycle
     Instruction exe;
     Instruction mem;
     Instruction wbc;
+    uint memory_number;
         
 };
 
@@ -53,11 +57,5 @@ bool assoc_instruction(Cycle & , const Instruction &);
  * \param cyclo Último ciclo
  *
  */
-void next_cycle(Cycle &);
-
-
-
-
-
-
-
+void next_cycle(Cycle &, std::ostream &);
+#endif
