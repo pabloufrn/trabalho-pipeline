@@ -23,7 +23,7 @@ Instruction::Instruction(std::string str)
         r3 = "\0";
 
     }
-    else if(aux=="lw" || aux == "sw") 
+    else if(aux=="lw" or aux == "sw") 
     {
 
         ws = str.find_first_of(',');
@@ -43,12 +43,41 @@ Instruction::Instruction(std::string str)
         r3 = "\0";
 
     }
-
-    else
+    else if (aux == "addui" or aux == "addi" or aux == "andi" or aux == "ori" or aux == "xori")
     {
         ws = str.find_first_of(',');
         r1 = str.substr(0, ws);
+        str = str.substr(ws+1, std::string::npos);
+        
+        ws = str.find_first_not_of(' ');
+        str = str.substr(ws, std::string::npos);
+        
+        ws = str.find_first_of(',');
+        r2 = str.substr(0, ws);
         str = str.substr(ws+2, std::string::npos);
+        std::cout << r2;
+        
+        
+    }
+    else if(aux == "li")
+    {
+        
+        ws = str.find_first_of(',');
+        r1 = str.substr(0, ws);
+
+        r2 = "\0";
+        
+        r3 = "\0";
+    }
+
+    else if(aux == "add" or aux == "add" or aux == "addu" or aux == "sub" or aux == "and" or aux == "beq" or aux == "bne" or aux == "xor" or aux == "or")
+    {
+        ws = str.find_first_of(',');
+        r1 = str.substr(0, ws);
+        str = str.substr(ws+1, std::string::npos);
+        
+        ws = str.find_first_not_of(' ');
+        str = str.substr(ws, std::string::npos);
 
         ws = str.find_first_of(',');
         r2 = str.substr(0, ws);
@@ -57,6 +86,10 @@ Instruction::Instruction(std::string str)
         ws = str.find_first_of(' ');
         r3 = str.substr(0, ws);
 
+    }
+    else 
+    {
+            throw runtime_error("[ERROR] Not supported instruction found.\n");
     }
 }
 
@@ -144,16 +177,7 @@ void next_cycle(Cycle & cic, std::ostream & os)
     cic.idc = cic.ift;
     cic.ift = Instruction("0");
     cic.number++;
-    /*
-       -------------------------------------------------------
-       Ciclo 1
-BI:  add $t0, $t1, $t2
-DI:  0
-EX:  0
-MEM: 0
-WB:  0
----------------------------------------------------------
-*/
+
     return;
 }
 

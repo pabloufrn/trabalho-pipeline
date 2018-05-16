@@ -1,5 +1,7 @@
-add $t0, $t1, $t2
+li $t1, 2
+add $t0, $t1, 3
 sub $s0, $t0, $t1
+
 
 
   
