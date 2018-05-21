@@ -70,7 +70,7 @@ Instruction::Instruction(std::string str)
         r3 = "\0";
     }
 
-    else if(aux == "add" or aux == "add" or aux == "addu" or aux == "sub" or aux == "and" or aux == "beq" or aux == "bne" or aux == "xor" or aux == "or")
+    else if(aux == "add" or aux == "addi" or aux == "addu" or aux == "sub" or aux == "and" or aux == "beq" or aux == "bne" or aux == "xor" or aux == "or")
     {
         ws = str.find_first_of(',');
         r1 = str.substr(0, ws);
@@ -86,6 +86,10 @@ Instruction::Instruction(std::string str)
         ws = str.find_first_of(' ');
         r3 = str.substr(0, ws);
 
+    }
+    else if(str.find_first_of(':') != std::string::npos)
+    {
+        r1 = aux;
     }
     else 
     {
